@@ -1,0 +1,37 @@
+{
+  "name": "hdc",
+  "version": "0.0.1",
+  "description": "NPM module implementing HDC Messages Format",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:c-geek/hdc.git"
+  },
+  "keywords": [
+    "hdc",
+    "nodecoin"
+  ],
+  "author": "Cedric Moreau <cem.moreau@gmail.com>",
+  "license": "MIT",
+  "readmeFilename": "readme.md",
+  "bugs": {
+    "url": "https://github.com/c-geek/hdc/issues"
+  },
+  "dependencies": {
+    "commander": "",
+    "async": "",
+    "sha1": "",
+    "underscore": ""
+  },
+  "devDependencies": {
+    "mocha": "",
+    "should": "",
+    "supertest": ""
+  }
+}
