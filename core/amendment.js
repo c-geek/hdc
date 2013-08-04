@@ -204,9 +204,7 @@ module.exports = function Amendment(rawAmend){
     return unix2dos(raw);
   };
 
-  if(rawAmend){
-    this.parse(rawAmend);
-  }
+  this.parse(rawAmend);
 };
 
 
