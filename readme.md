@@ -37,9 +37,12 @@ To handle certificates data, just:
 ```js
 var Amendment = require('hdc').Amendment;
 
-var am = new Amendment.loadFromFile('/path/to/amendment_file', function(){
-  // Here we are
-});
+var data = fs.readFileSync('/path/to/amendment', 'utf8');
+var am = new Amendment(data);
+if(am.error){
+  // Some error happened while parsing data
+  console.log(am.error);
+}
 ```
 Then, several data maybe extracted:
 

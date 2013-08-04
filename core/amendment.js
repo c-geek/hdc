@@ -1,9 +1,8 @@
-var async    = require('async');
-var sha1     = require('sha1');
-var _        = require('underscore');
-var fs       = require('fs');
+var async = require('async');
+var sha1  = require('sha1');
+var _     = require('underscore');
 
-module.exports = function Amendment(){
+module.exports = function Amendment(rawAmend){
 
   this.version = null;
   this.currency = null;
@@ -18,116 +17,119 @@ module.exports = function Amendment(){
   this.membersCount = null;
   this.membersChanges = [];
   this.hash = null;
+  this.error = null;
 
-  this.parse = function(rawAmend, callback) {
+  this.parse = function(rawAmend) {
     if(!rawAmend){
-      callback("No amendment given");
-      return;
+      this.error = "No amendment given";
+      return false;
     }
-    this.hash = sha1(unix2dos(rawAmend)).toUpperCase();
-    var obj = this;
-    var captures = [
-      {prop: "version",         regexp: /Version: (.*)/},
-      {prop: "currency",        regexp: /Currency: (.*)/},
-      {prop: "number",          regexp: /Number: (.*)/},
-      {prop: "previousHash",    regexp: /PreviousHash: (.*)/},
-      {prop: "dividend",        regexp: /UniversalDividend: (.*)/},
-      {prop: "coinMinPower",    regexp: /CoinMinimalPower: (.*)/},
-      {prop: "votersRoot",      regexp: /VotersRoot: (.*)/},
-      {prop: "votersCount",     regexp: /VotersCount: (.*)/},
-      {prop: "votersChanges",   regexp: /VotersChanges:\n([\s\S]*)MembersRoot/},
-      {prop: "membersRoot",     regexp: /MembersRoot: (.*)/},
-      {prop: "membersCount",    regexp: /MembersCount: (.*)/},
-      {prop: "membersChanges",  regexp: /MembersChanges:\n([\s\S]*)/}
-    ];
-    var crlfCleaned = rawAmend.replace(/\r\n/g, "\n");
-    if(crlfCleaned.match(/\n$/)){
-      async.forEach(captures, function (cap, done) {
-        if(cap.prop != "membersChanges" && cap.prop != "votersChanges")
-          simpleLineExtraction(obj, crlfCleaned, cap, done);
-        else
-          multipleLinesExtraction(obj, crlfCleaned, cap, done);
-      }, callback);
+    else{
+      this.hash = sha1(unix2dos(rawAmend)).toUpperCase();
+      var obj = this;
+      var captures = [
+        {prop: "version",         regexp: /Version: (.*)/},
+        {prop: "currency",        regexp: /Currency: (.*)/},
+        {prop: "number",          regexp: /Number: (.*)/},
+        {prop: "previousHash",    regexp: /PreviousHash: (.*)/},
+        {prop: "dividend",        regexp: /UniversalDividend: (.*)/},
+        {prop: "coinMinPower",    regexp: /CoinMinimalPower: (.*)/},
+        {prop: "votersRoot",      regexp: /VotersRoot: (.*)/},
+        {prop: "votersCount",     regexp: /VotersCount: (.*)/},
+        {prop: "votersChanges",   regexp: /VotersChanges:\n([\s\S]*)MembersRoot/},
+        {prop: "membersRoot",     regexp: /MembersRoot: (.*)/},
+        {prop: "membersCount",    regexp: /MembersCount: (.*)/},
+        {prop: "membersChanges",  regexp: /MembersChanges:\n([\s\S]*)/}
+      ];
+      var crlfCleaned = rawAmend.replace(/\r\n/g, "\n");
+      if(crlfCleaned.match(/\n$/)){
+        captures.forEach(function (cap) {
+          if(cap.prop != "membersChanges" && cap.prop != "votersChanges")
+            simpleLineExtraction(obj, crlfCleaned, cap);
+          else{
+            this.error = multipleLinesExtraction(obj, crlfCleaned, cap);
+            if(this.error)
+              return false;
+          }
+        });
+        return true;
+      }
+      else{
+        this.error = "Bad document structure: no new line character at the end of the document.";
+        return false;
+      }
     }
-    else callback("Bad document structure: no new line character at the end of the document.");
   };
 
-  this.verify = function(currency, done){
-    var obj = this;
-    async.waterfall([
-      function(callback, err){
-        // Version
-        if(!obj.version || !obj.version.match(/^1$/))
-          err = {code: 100, message: "Version unknown"};
-        callback(err);
-      },
-      function(callback, err){
-        // Currency
-        if(!obj.currency || !obj.currency.match("^"+ currency + "$"))
-          err = {code: 101, message: "Currency '"+ obj.currency +"' not managed"};
-        callback(err);
-      },
-      function(callback, err){
-        // Number
-        if(!obj.number || !obj.number.match(/^\d+$/))
-          err = {code: 102, message: "Incorrect Number field"};
-        callback(err);
-      },
-      function(callback, err){
-        // Previous hash
-        var isRoot = parseInt(obj.number, 10) === 0;
-        if(!isRoot && (!obj.previousHash || !obj.previousHash.match(/^[A-Z\d]{40}$/)))
-          err = {code: 103, message: "PreviousHash must be provided for non-root amendment and match an uppercase SHA1 hash"};
-        else if(isRoot && obj.previousHash)
-          err = {code: 104, message: "PreviousHash must not be provided for root amendment"};
-        callback(err);
-      },
-      function(callback, err){
-        // Universal Dividend
-        if(obj.dividend && !obj.dividend.match(/^\d+$/))
-          err = {code: 105, message: "UniversalDividend must be a decimal number"};
-        callback(err);
-      },
-      function(callback, err){
-        // Coin Minimal Power
-        if(obj.coinMinPower && !obj.dividend)
-          err = {code: 106, message: "CoinMinimalPower requires a valued UniversalDividend field"};
-        else if(obj.coinMinPower && !obj.coinMinPower.match(/^\d+$/))
-          err = {code: 107, message: "CoinMinimalPower must be a decimal number"};
-        else if(obj.coinMinPower && obj.dividend.length < parseInt(obj.coinMinPower, 10) + 1)
-          err = {code: 108, message: "No coin can be created with this value of CoinMinimalPower and UniversalDividend"};
-        callback(err);
-      },
-      function(callback, err){
-        // VotersRoot
-        if(!obj.votersRoot || !obj.votersRoot.match(/^[A-Z\d]{40}$/))
-          err = {code: 109, message: "VotersRoot must be provided and match an uppercase SHA1 hash"};
-        callback(err);
-      },
-      function(callback, err){
-        // VotersCount
-        if(!obj.votersCount || !obj.votersCount.match(/^\d+$/))
-          err = {code: 110, message: "VotersCount must be a positive or null decimal number"};
-        callback(err);
-      },
-      function(callback, err){
-        // MembersRoot
-        if(!obj.membersRoot || !obj.membersRoot.match(/^[A-Z\d]{40}$/))
-          err = {code: 111, message: "MembersRoot must be provided and match an uppercase SHA1 hash"};
-        callback(err);
-      },
-      function(callback, err){
-        // MembersCount
-        if(!obj.membersCount || !obj.membersCount.match(/^\d+$/))
-          err = {code: 112, message: "MembersCount must be a positive or null decimal number"};
-        callback(err);
-      }
-    ], function (err, result) {
-      if(err)
-        done(err.message, err.code);
-      else
-        done();
-    });};
+  this.verify = function(currency){
+    var err = null;
+    if(this.error){
+      err = {code: 0, message: this.error};
+    }
+    if(!err){
+      // Version
+      if(!this.version || !this.version.match(/^1$/))
+        err = {code: 100, message: "Version unknown"};
+    }
+    if(!err){
+      // Currency
+      if(!this.currency || !this.currency.match("^"+ currency + "$"))
+        err = {code: 101, message: "Currency '"+ this.currency +"' not managed"};
+    }
+    if(!err){
+      // Number
+      if(!this.number || !this.number.match(/^\d+$/))
+        err = {code: 102, message: "Incorrect Number field"};
+    }
+    if(!err){
+      // Previous hash
+      var isRoot = parseInt(this.number, 10) === 0;
+      if(!isRoot && (!this.previousHash || !this.previousHash.match(/^[A-Z\d]{40}$/)))
+        err = {code: 103, message: "PreviousHash must be provided for non-root amendment and match an uppercase SHA1 hash"};
+      else if(isRoot && this.previousHash)
+        err = {code: 104, message: "PreviousHash must not be provided for root amendment"};
+    }
+    if(!err){
+      // Universal Dividend
+      if(this.dividend && !this.dividend.match(/^\d+$/))
+        err = {code: 105, message: "UniversalDividend must be a decimal number"};
+    }
+    if(!err){
+      // Coin Minimal Power
+      if(this.coinMinPower && !this.dividend)
+        err = {code: 106, message: "CoinMinimalPower requires a valued UniversalDividend field"};
+      else if(this.coinMinPower && !this.coinMinPower.match(/^\d+$/))
+        err = {code: 107, message: "CoinMinimalPower must be a decimal number"};
+      else if(this.coinMinPower && this.dividend.length < parseInt(this.coinMinPower, 10) + 1)
+        err = {code: 108, message: "No coin can be created with this value of CoinMinimalPower and UniversalDividend"};
+    }
+    if(!err){
+      // VotersRoot
+      if(!this.votersRoot || !this.votersRoot.match(/^[A-Z\d]{40}$/))
+        err = {code: 109, message: "VotersRoot must be provided and match an uppercase SHA1 hash"};
+    }
+    if(!err){
+      // VotersCount
+      if(!this.votersCount || !this.votersCount.match(/^\d+$/))
+        err = {code: 110, message: "VotersCount must be a positive or null decimal number"};
+    }
+    if(!err){
+      // MembersRoot
+      if(!this.membersRoot || !this.membersRoot.match(/^[A-Z\d]{40}$/))
+        err = {code: 111, message: "MembersRoot must be provided and match an uppercase SHA1 hash"};
+    }
+    if(!err){
+      // MembersCount
+      if(!this.membersCount || !this.membersCount.match(/^\d+$/))
+        err = {code: 112, message: "MembersCount must be a positive or null decimal number"};
+    }
+    if(err){
+      this.error = err.message;
+      this.errorCode = err.code;
+      return false;
+    }
+    return true;
+  };
 
   this.getNewMembers = function() {
     var members = [];
@@ -202,28 +204,22 @@ module.exports = function Amendment(){
     return unix2dos(raw);
   };
 
-  this.loadFromFile = function(file, done) {
-    var obj = this;
-    fs.readFile(file, {encoding: "utf8"}, function (err, data) {
-      obj.parse(data, function(err) {
-        done(err);
-      });
-    });
+  if(rawAmend){
+    this.parse(rawAmend);
   }
 };
 
 
 
-function simpleLineExtraction(am, wholeAmend, cap, done) {
+function simpleLineExtraction(am, wholeAmend, cap) {
   var fieldValue = wholeAmend.match(cap.regexp);
   if(fieldValue && fieldValue.length === 2){
     am[cap.prop] = fieldValue[1];
-    done();
   }
-  else done();
+  return;
 }
 
-function multipleLinesExtraction(am, wholeAmend, cap, done) {
+function multipleLinesExtraction(am, wholeAmend, cap) {
   var fieldValue = wholeAmend.match(cap.regexp);
   am[cap.prop] = [];
   if(fieldValue && fieldValue.length == 2){
@@ -236,15 +232,13 @@ function multipleLinesExtraction(am, wholeAmend, cap, done) {
           am[cap.prop].push(fprChange[1]);
         }
         else{
-          done("Wrong structure for line: '" + line + "'");
-          return;
+          return "Wrong structure for line: '" + line + "'";
         }
       }
-      done();
     }
-    else done("Multiple line field '" + cap.prop + "' must end with a new line character");
+    else return "Wrong structure for line: '" + line + "'";
   }
-  else done();
+  return;
 }
 
 function trim(str){

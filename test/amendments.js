@@ -1,6 +1,7 @@
 var should    = require('should');
 var assert    = require('assert');
 var sha1      = require('sha1');
+var fs        = require('fs');
 var Amendment = require('../core/amendment');
 
 var amTest;
@@ -12,7 +13,7 @@ describe('Amendment', function(){
     // Loads amTest with its data
     before(function(done) {
       amTest = new Amendment();
-      amTest.loadFromFile(__dirname + "/data/amendments/BB-AM0-OK", done);
+      loadFromFile(amTest, __dirname + "/data/amendments/BB-AM0-OK", done);
     });
 
     it('should be version 1', function(){
@@ -76,7 +77,7 @@ describe('Amendment', function(){
     // Loads amTest with its data
     before(function(done) {
       amTest = new Amendment();
-      amTest.loadFromFile(__dirname + "/data/amendments/BB-AM1-OK", done);
+      loadFromFile(amTest, __dirname + "/data/amendments/BB-AM1-OK", done);
     });
 
     it('should be version 1', function(){
@@ -129,7 +130,7 @@ describe('Amendment', function(){
     // Loads amTest with its data
     before(function(done) {
       amTest = new Amendment();
-      amTest.loadFromFile(__dirname + "/data/amendments/BB-AM2-OK", done);
+      loadFromFile(amTest, __dirname + "/data/amendments/BB-AM2-OK", done);
     });
 
     it('should be version 1', function(){
@@ -198,11 +199,10 @@ describe('Amendment', function(){
     // Loads amTest with its data
     before(function(done) {
       amTest = new Amendment();
-      amTest.loadFromFile(__dirname + "/data/amendments/BB-AM2-WRONG-UD", function(err) {
-        amTest.verify("beta_brousouf", function(err, code) {
-          errCode = code;
-          done();
-        });
+      loadFromFile(amTest, __dirname + "/data/amendments/BB-AM2-WRONG-UD", function(err) {
+        var success = amTest.verify("beta_brousouf");
+        errCode = amTest.errorCode;
+        done();
       });
     });
 
@@ -231,3 +231,11 @@ describe('Amendment', function(){
     });
   });
 });
+
+
+function loadFromFile(am, file, done) {
+  fs.readFile(file, {encoding: "utf8"}, function (err, data) {
+    am.parse(data);
+    done(err);
+  });
+}
