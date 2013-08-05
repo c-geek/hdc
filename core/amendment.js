@@ -108,6 +108,11 @@ module.exports = function Amendment(rawAmend){
         err = {code: 108, message: "No coin can be created with this value of CoinMinimalPower and UniversalDividend"};
     }
     if(!err){
+      // VotersSignaturesRoot
+      if(!this.votersSigRoot || !this.votersSigRoot.match(/^[A-Z\d]{40}$/))
+        err = {code: 109, message: "VotersSignaturesRoot must be provided and match an uppercase SHA1 hash"};
+    }
+    if(!err){
       // VotersRoot
       if(!this.votersRoot || !this.votersRoot.match(/^[A-Z\d]{40}$/))
         err = {code: 109, message: "VotersRoot must be provided and match an uppercase SHA1 hash"};
@@ -116,6 +121,11 @@ module.exports = function Amendment(rawAmend){
       // VotersCount
       if(!this.votersCount || !this.votersCount.match(/^\d+$/))
         err = {code: 110, message: "VotersCount must be a positive or null decimal number"};
+    }
+    if(!err){
+      // MembersStatusRoot
+      if(!this.membersStatusRoot || !this.membersStatusRoot.match(/^[A-Z\d]{40}$/))
+        err = {code: 111, message: "MembersStatusRoot must be provided and match an uppercase SHA1 hash"};
     }
     if(!err){
       // MembersRoot
