@@ -10,11 +10,13 @@ module.exports = function Amendment(rawAmend){
   this.previousHash = null;
   this.dividend = null;
   this.coinMinPower = null;
+  this.votersSigRoot = null;
   this.votersRoot = null;
-  this.votersCount = null;
+  this.votersCount = 0;
   this.votersChanges = [];
+  this.membersStatusRoot = null;
   this.membersRoot = null;
-  this.membersCount = null;
+  this.membersCount = 0;
   this.membersChanges = [];
   this.hash = null;
   this.error = null;
@@ -28,18 +30,20 @@ module.exports = function Amendment(rawAmend){
       this.hash = sha1(unix2dos(rawAmend)).toUpperCase();
       var obj = this;
       var captures = [
-        {prop: "version",         regexp: /Version: (.*)/},
-        {prop: "currency",        regexp: /Currency: (.*)/},
-        {prop: "number",          regexp: /Number: (.*)/},
-        {prop: "previousHash",    regexp: /PreviousHash: (.*)/},
-        {prop: "dividend",        regexp: /UniversalDividend: (.*)/},
-        {prop: "coinMinPower",    regexp: /CoinMinimalPower: (.*)/},
-        {prop: "votersRoot",      regexp: /VotersRoot: (.*)/},
-        {prop: "votersCount",     regexp: /VotersCount: (.*)/},
-        {prop: "votersChanges",   regexp: /VotersChanges:\n([\s\S]*)MembersRoot/},
-        {prop: "membersRoot",     regexp: /MembersRoot: (.*)/},
-        {prop: "membersCount",    regexp: /MembersCount: (.*)/},
-        {prop: "membersChanges",  regexp: /MembersChanges:\n([\s\S]*)/}
+        {prop: "version",           regexp: /Version: (.*)/},
+        {prop: "currency",          regexp: /Currency: (.*)/},
+        {prop: "number",            regexp: /Number: (.*)/},
+        {prop: "previousHash",      regexp: /PreviousHash: (.*)/},
+        {prop: "dividend",          regexp: /UniversalDividend: (.*)/},
+        {prop: "coinMinPower",      regexp: /CoinMinimalPower: (.*)/},
+        {prop: "votersSigRoot",     regexp: /VotersSignaturesRoot: (.*)/},
+        {prop: "votersRoot",        regexp: /VotersRoot: (.*)/},
+        {prop: "votersCount",       regexp: /VotersCount: (.*)/},
+        {prop: "votersChanges",     regexp: /VotersChanges:\n([\s\S]*)MembersRoot/},
+        {prop: "membersStatusRoot", regexp: /MembersStatusRoot: (.*)/},
+        {prop: "membersRoot",       regexp: /MembersRoot: (.*)/},
+        {prop: "membersCount",      regexp: /MembersCount: (.*)/},
+        {prop: "membersChanges",    regexp: /MembersChanges:\n([\s\S]*)/}
       ];
       var crlfCleaned = rawAmend.replace(/\r\n/g, "\n");
       if(crlfCleaned.match(/\n$/)){
@@ -189,12 +193,16 @@ module.exports = function Amendment(rawAmend){
     if(this.coinMinPower){
       raw += "CoinMinimalPower: " + this.coinMinPower + "\n";
     }
-    raw += "VotersRoot: " + this.votersRoot + "\n";
-    raw += "VotersCount: " + this.votersCount + "\n";
-    raw += "VotersChanges:\n";
-    for(var j = 0; j < this.votersChanges.length; j++){
-      raw += this.votersChanges[j] + "\n";
+    if(this.votersCount){
+      raw += "VotersSignaturesRoot: " + this.votersSigRoot + "\n";
+      raw += "VotersRoot: " + this.votersRoot + "\n";
+      raw += "VotersCount: " + this.votersCount + "\n";
+      raw += "VotersChanges:\n";
+      for(var j = 0; j < this.votersChanges.length; j++){
+        raw += this.votersChanges[j] + "\n";
+      }
     }
+    raw += "MembersStatusRoot: " + this.membersStatusRoot + "\n";
     raw += "MembersRoot: " + this.membersRoot + "\n";
     raw += "MembersCount: " + this.membersCount + "\n";
     raw += "MembersChanges:\n";
