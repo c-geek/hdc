@@ -58,20 +58,21 @@ module.exports = function Transaction(rawTx){
     var err = null;
     var code = 150;
     var codes = {
-      'BAD_VERSION': code++,
-      'BAD_CURRENCY': code++,
-      'BAD_NUMBER': code++,
-      'BAD_SENDER': code++,
-      'BAD_RECIPIENT': code++,
-      'BAD_RECIPIENT_OF_NONTRANSFERT': code++,
-      'BAD_PREV_HASH_PRESENT': code++,
-      'BAD_PREV_HASH_ABSENT': code++,
-      'BAD_TYPE': code++,
-      'BAD_TX_NEEDONECOIN': code++,
-      'BAD_TX_NULL': code++,
-      'BAD_TX_NOTNULL': code++,
-      'BAD_FUSION_COIN': code++,
-      'BAD_FUSION_SUM': code++
+      'BAD_VERSION': 150,
+      'BAD_CURRENCY': 151,
+      'BAD_NUMBER': 152,
+      'BAD_SENDER': 153,
+      'BAD_RECIPIENT': 154,
+      'BAD_RECIPIENT_OF_NONTRANSFERT': 155,
+      'BAD_PREV_HASH_PRESENT': 156,
+      'BAD_PREV_HASH_ABSENT': 157,
+      'BAD_TYPE': 158,
+      'BAD_TX_NEEDONECOIN': 159,
+      'BAD_TX_NULL': 160,
+      'BAD_TX_NOTNULL': 161,
+      'BAD_FUSION_COIN': 162,
+      'BAD_FUSION_SUM': 163,
+      'BAD_COINS_OF_VARIOUS_AM': 164
     }
     if(!err){
       // Version
@@ -135,7 +136,16 @@ module.exports = function Transaction(rawTx){
           if(!err && coin.transaction){
             err = {code: codes['BAD_TX_NOTNULL'], message: "Coin in an ISSUANCE transaction must NOT have a transaction link"};
           }
-        })
+        });
+        if(!err){
+          var amNumber = '';
+          coins.forEach(function (coin, index) {
+            amNumber = amNumber || coin.originNumber;
+            if(!err && coin.originNumber != amNumber){
+              err = {code: codes['BAD_COINS_OF_VARIOUS_AM'], message: "Coin in an ISSUANCE transaction must ALL target the SAME amendment number"};
+            }
+          });
+        }
       }
       if(this.type == 'FUSION'){
         var coin0_origin = coins[0].originType + "-" + coins[0].originNumber;

@@ -253,6 +253,26 @@ describe('Transaction', function(){
       should.exist(tx1.error);
     });
   });
+
+  describe('3 (issuance)', function(){
+
+    var tx1;
+
+    // Loads tx1 with its data
+    before(function(done) {
+      tx1 = new Transaction();
+      loadFromFile(tx1, __dirname + "/data/tx/issuance3.tx", done);
+    });
+
+    it('it should have error code', function(){
+      should.exist(tx1.errorCode);
+      tx1.errorCode.should.equal(164);
+    });
+
+    it('it should have error', function(){
+      should.exist(tx1.error);
+    });
+  });
 });
 
 function loadFromFile(tx, file, done) {
