@@ -28,6 +28,10 @@ describe('Amendment', function(){
       assert.equal(amTest.number, 0);
     });
 
+    it('should be generated on 1380397288', function(){
+      assert.equal(amTest.generated, 1380397288);
+    });
+
     it('should have no Universal Dividend', function(){
       should.not.exist(amTest.dividend);
     });
@@ -36,12 +40,20 @@ describe('Amendment', function(){
       should.not.exist(amTest.coinMinPower);
     });
 
+    it('should have 2 next required votes', function(){
+      assert.equal(amTest.nextVotes, 2);
+    });
+
     it('should have no previous hash', function(){
       should.not.exist(amTest.previousHash);
     });
 
-    it('should have members status root BF5E8C1A8FD9AE05520A4D886846903546207470', function(){
-      assert.equal(amTest.membersStatusRoot, 'BF5E8C1A8FD9AE05520A4D886846903546207470');
+    it('should have no previous votes root', function(){
+      should.not.exist(amTest.previousVotesRoot);
+    });
+
+    it('should have no previous votes count', function(){
+      should.not.exist(amTest.previousVotesCount);
     });
 
     it('should have F5ACFD67FC908D28C0CFDAD886249AC260515C90 members hash', function(){
@@ -51,32 +63,33 @@ describe('Amendment', function(){
     it('should have the following 3 new members', function(){
       var newMembers = amTest.getNewMembers();
       assert.equal(newMembers.length, 3);
+      assert.equal(amTest.getLeavingMembers(), 0);
       assert.equal(amTest.membersCount, 3);
       assert.equal(newMembers[0], "2E69197FAB029D8669EF85E82457A1587CA0ED9C"); // Obito Uchiwa
       assert.equal(newMembers[1], "33BBFC0C67078D72AF128B5BA296CC530126F372"); // John Snow
       assert.equal(newMembers[2], "C73882B64B7E72237A2F460CE9CAB76D19A8651E"); // LoL Cat
     });
 
-    it('should have no voters hash', function(){
-      assert.not.exist(amTest.votersRoot);
+    it('should have F5ACFD67FC908D28C0CFDAD886249AC260515C90 voters hash', function(){
+      assert.equal('F5ACFD67FC908D28C0CFDAD886249AC260515C90', amTest.votersRoot);
     });
 
-    it('should have no voters signatures root', function(){
-      assert.not.exist(amTest.votersSigRoot);
-    });
-
-    it('should have the following 0 new voters', function(){
+    it('should have the following 3 new voters', function(){
       var newVoters = amTest.getNewVoters();
-      assert.equal(newVoters.length, 0);
-      assert.equal(amTest.votersCount, 0);
+      assert.equal(newVoters.length, 3);
+      assert.equal(amTest.getLeavingVoters(), 0);
+      assert.equal(amTest.votersCount, 3);
+      assert.equal(newVoters[0], "2E69197FAB029D8669EF85E82457A1587CA0ED9C"); // Obito Uchiwa
+      assert.equal(newVoters[1], "33BBFC0C67078D72AF128B5BA296CC530126F372"); // John Snow
+      assert.equal(newVoters[2], "C73882B64B7E72237A2F460CE9CAB76D19A8651E"); // LoL Cat
     });
 
-    it('its computed hash should be B8466DCE648049168D65D915683893BEFA9240AA', function(){
-      assert.equal(amTest.hash, 'B8466DCE648049168D65D915683893BEFA9240AA');
+    it('its computed hash should be 58A2700B6CE56E112238FDCD81C8DACE2F2D06DC', function(){
+      assert.equal(amTest.hash, '58A2700B6CE56E112238FDCD81C8DACE2F2D06DC');
     });
 
-    it('its manual hash should be B8466DCE648049168D65D915683893BEFA9240AA', function(){
-      assert.equal(sha1(amTest.getRaw()).toUpperCase(), 'B8466DCE648049168D65D915683893BEFA9240AA');
+    it('its manual hash should be 58A2700B6CE56E112238FDCD81C8DACE2F2D06DC', function(){
+      assert.equal(sha1(amTest.getRaw()).toUpperCase(), '58A2700B6CE56E112238FDCD81C8DACE2F2D06DC');
     });
   });
 });
