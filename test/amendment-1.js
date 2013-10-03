@@ -16,6 +16,11 @@ describe('Amendment', function(){
       loadFromFile(amTest, __dirname + "/data/amendments/BB-AM1-OK", done);
     });
 
+    it('should be verified for beta_brousouf currency', function(){
+      var verified = amTest.verify("beta_brousouf");
+      assert.equal(verified, true);
+    });
+
     it('should be version 1', function(){
       assert.equal(amTest.version, 1);
     });

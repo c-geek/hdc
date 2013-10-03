@@ -29,6 +29,7 @@ module.exports = function Amendment(rawAmend){
       return false;
     }
     else{
+      this.error = "";
       this.hash = sha1(unix2dos(rawAmend)).toUpperCase();
       var obj = this;
       var captures = [
@@ -142,14 +143,14 @@ module.exports = function Amendment(rawAmend){
         err = {code: codes['PREV_HASH'], message: "PreviousHash must not be provided for root amendment"};
     }
     if(!err){
-      // PreviousVotesRoot
-      if(this.previousVotesRoot && !this.previousVotesRoot.match(/^\d+$/))
-        err = {code: codes['PREV_VOTES_ROOT'], message: "PreviousVotesRoot must be a positive or zero integer"};
-    }
-    if(!err){
       // PreviousVotesCount
       if(this.previousVotesCount && !this.previousVotesCount.match(/^\d+$/))
         err = {code: codes['PREV_VOTES_COUNT'], message: "PreviousVotesCount must be a positive or zero integer"};
+    }
+    if(!err){
+      // PreviousVotesRoot
+      if(this.previousVotesRoot && !this.previousVotesRoot.match(/^[A-Z\d]{40}$/))
+        err = {code: codes['PREV_VOTES_ROOT'], message: "PreviousVotesRoot must be provided and match an uppercase SHA1 hash"};
     }
     if(!err){
       // VotersRoot

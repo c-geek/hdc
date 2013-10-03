@@ -21,6 +21,11 @@ describe('Amendment', function(){
       });
     });
 
+    it('should NOT be verified for beta_brousouf currency', function(){
+      var verified = amTest.verify("beta_brousouf");
+      assert.equal(verified, false);
+    });
+
     it('should be version 1', function(){
       assert.equal(amTest.version, 1);
     });
