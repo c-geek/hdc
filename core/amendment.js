@@ -113,7 +113,7 @@ module.exports = function Amendment(rawAmend){
     if(!err){
       // GeneratedOn
       if(!this.generated || !this.generated.match(/^\d+$/))
-        err = {code: codes['GENERATEDON'], message: "GeneratedOn field"};
+        err = {code: codes['GENERATEDON'], message: "GeneratedOn field must be a positive or zero integer"};
     }
     if(!err){
       // Universal Dividend
@@ -246,11 +246,13 @@ module.exports = function Amendment(rawAmend){
     if(this.previousVotesCount){
       raw += "PreviousVotesCount: " + this.previousVotesCount + "\n";
     }
-    raw += "MembersRoot: " + this.membersRoot + "\n";
-    raw += "MembersCount: " + this.membersCount + "\n";
-    raw += "MembersChanges:\n";
-    for(var i = 0; i < this.membersChanges.length; i++){
-      raw += this.membersChanges[i] + "\n";
+    if(this.membersRoot){
+      raw += "MembersRoot: " + this.membersRoot + "\n";
+      raw += "MembersCount: " + this.membersCount + "\n";
+      raw += "MembersChanges:\n";
+      for(var i = 0; i < this.membersChanges.length; i++){
+        raw += this.membersChanges[i] + "\n";
+      }
     }
     raw += "VotersRoot: " + this.votersRoot + "\n";
     raw += "VotersCount: " + this.votersCount + "\n";
