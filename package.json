@@ -1,6 +1,6 @@
 {
   "name": "hdc",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "NPM module implementing HDC Messages Format",
   "main": "index.js",
   "directories": {
