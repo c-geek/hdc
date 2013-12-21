@@ -101,7 +101,7 @@ module.exports = function Transaction(rawTx){
     }
     if(!err){
       // Recipient = Sender for ISSUANCE and FUSION
-      if(this.type != 'TRANSFERT' && this.sender != this.recipient){
+      if(this.type != 'TRANSFER' && this.sender != this.recipient){
         err = {code: codes['BAD_RECIPIENT_OF_NONTRANSFERT'], message: "Recipient must be equal to Sender on ISSUANCE and FUSION transactions"};
       }
     }
@@ -115,7 +115,7 @@ module.exports = function Transaction(rawTx){
     }
     if(!err){
       // Type
-      if(!this.type || !this.type.match(/^(ISSUANCE|FUSION|TRANSFERT)$/))
+      if(!this.type || !this.type.match(/^(ISSUANCE|FUSION|TRANSFER)$/))
         err = {code: codes['BAD_TYPE'], message: "Incorrect Type field"};
     }
     if(!err){
@@ -124,10 +124,10 @@ module.exports = function Transaction(rawTx){
       if(coins.length == 0){
         err = {code: codes['BAD_TX_NEEDONECOIN'], message: "Transaction requires at least one coin"};
       }
-      if(this.type == 'TRANSFERT'){
+      if(this.type == 'TRANSFER'){
         coins.forEach(function (coin, index) {
           if(!err && !coin.transaction){
-            err = {code: codes['BAD_TX_NULL'], message: "Coin in a TRANSFERT transaction must have a transaction link"};
+            err = {code: codes['BAD_TX_NULL'], message: "Coin in a TRANSFER transaction must have a transaction link"};
           }
         })
       }
