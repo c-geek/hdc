@@ -53,14 +53,6 @@ describe('Amendment', function(){
       assert.equal(amTest.previousHash, '58A2700B6CE56E112238FDCD81C8DACE2F2D06DC');
     });
 
-    it('should have no previous votes root', function(){
-      assert.equal(amTest.previousVotesRoot, 'C8239FF2434490AFE28BA339F53C7237B7C14B19');
-    });
-
-    it('should have 3 previous votes count', function(){
-      assert.equal(amTest.previousVotesCount, 3);
-    });
-
     it('should have F5ACFD67FC908D28C0CFDAD886249AC260515C90 members hash', function(){
       assert.equal('F5ACFD67FC908D28C0CFDAD886249AC260515C90', amTest.membersRoot);
     });
@@ -81,12 +73,12 @@ describe('Amendment', function(){
       assert.equal(amTest.votersCount, 3);
     });
 
-    it('its computed hash should be 5A6434BCD09400625CEA75BFE6F786829018BAD1', function(){
-      assert.equal(amTest.hash, '5A6434BCD09400625CEA75BFE6F786829018BAD1');
+    it('its computed hash should be F07D0B6DBB7EA99E5208752EABDB8B721C0010E9', function(){
+      assert.equal(amTest.hash, 'F07D0B6DBB7EA99E5208752EABDB8B721C0010E9');
     });
 
-    it('its manual hash should be 5A6434BCD09400625CEA75BFE6F786829018BAD1', function(){
-      assert.equal(sha1(amTest.getRaw()).toUpperCase(), '5A6434BCD09400625CEA75BFE6F786829018BAD1');
+    it('its manual hash should be F07D0B6DBB7EA99E5208752EABDB8B721C0010E9', function(){
+      assert.equal(sha1(amTest.getRaw()).toUpperCase(), 'F07D0B6DBB7EA99E5208752EABDB8B721C0010E9');
     });
   });
 });

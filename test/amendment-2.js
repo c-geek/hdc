@@ -49,16 +49,8 @@ describe('Amendment', function(){
       assert.equal(amTest.nextVotes, 2);
     });
 
-    it('should have 5A6434BCD09400625CEA75BFE6F786829018BAD1 previous hash', function(){
-      assert.equal(amTest.previousHash, '5A6434BCD09400625CEA75BFE6F786829018BAD1');
-    });
-
-    it('should have previous votes root 21DDC685FB54AB0520B091E3762845F0AA97C257', function(){
-      assert.equal(amTest.previousVotesRoot, '21DDC685FB54AB0520B091E3762845F0AA97C257');
-    });
-
-    it('should have 3 previous votes count', function(){
-      assert.equal(amTest.previousVotesCount, 3);
+    it('should have F07D0B6DBB7EA99E5208752EABDB8B721C0010E9 previous hash', function(){
+      assert.equal(amTest.previousHash, 'F07D0B6DBB7EA99E5208752EABDB8B721C0010E9');
     });
 
     it('should have F92B6F81C85200250EE51783F5F9F6ACA57A9AFF members hash', function(){
@@ -88,12 +80,12 @@ describe('Amendment', function(){
       assert.equal(amTest.votersCount, 2);
     });
 
-    it('its computed hash should be B913193383A3BF119A28CA40A664531922DE2ADC', function(){
-      assert.equal(amTest.hash, 'B913193383A3BF119A28CA40A664531922DE2ADC');
+    it('its computed hash should be 02D8FCAA86A958EE07385C12DCDB4178BB5284CE', function(){
+      assert.equal(amTest.hash, '02D8FCAA86A958EE07385C12DCDB4178BB5284CE');
     });
 
-    it('its manual hash should be B913193383A3BF119A28CA40A664531922DE2ADC', function(){
-      assert.equal(sha1(amTest.getRaw()).toUpperCase(), 'B913193383A3BF119A28CA40A664531922DE2ADC');
+    it('its manual hash should be 02D8FCAA86A958EE07385C12DCDB4178BB5284CE', function(){
+      assert.equal(sha1(amTest.getRaw()).toUpperCase(), '02D8FCAA86A958EE07385C12DCDB4178BB5284CE');
     });
   });
 });

@@ -12,8 +12,6 @@ module.exports = function Amendment(rawAmend){
   this.coinMinPower = null;
   this.nextVotes = null;
   this.previousHash = null;
-  this.previousVotesRoot = null;
-  this.previousVotesCount = null;
   this.membersRoot = null;
   this.membersCount = 0;
   this.membersChanges = [];
@@ -41,8 +39,6 @@ module.exports = function Amendment(rawAmend){
         {prop: "coinMinPower",      regexp: /CoinMinimalPower: (.*)/},
         {prop: "nextVotes",         regexp: /NextRequiredVotes: (.*)/},
         {prop: "previousHash",      regexp: /PreviousHash: (.*)/},
-        {prop: "previousVotesRoot", regexp: /PreviousVotesRoot: (.*)/},
-        {prop: "previousVotesCount",regexp: /PreviousVotesCount: (.*)/},
         {prop: "membersRoot",       regexp: /MembersRoot: (.*)/},
         {prop: "membersCount",      regexp: /MembersCount: (.*)/},
         {prop: "membersChanges",    regexp: /MembersChanges:\n([\s\S]*)VotersRoot/},
@@ -80,8 +76,6 @@ module.exports = function Amendment(rawAmend){
       'UD': 154,
       'NEXT_VOTES': 156,
       'PREV_HASH': 157,
-      'PREV_VOTES_ROOT': 158,
-      'PREV_VOTES_COUNT': 159,
       'MEMBERS_ROOT': 160,
       'MEMBERS_COUNT': 161,
       'MEMBERS_CHANGES': 162,
@@ -141,16 +135,6 @@ module.exports = function Amendment(rawAmend){
         err = {code: codes['PREV_HASH'], message: "PreviousHash must be provided for non-root amendment and match an uppercase SHA1 hash"};
       else if(isRoot && this.previousHash)
         err = {code: codes['PREV_HASH'], message: "PreviousHash must not be provided for root amendment"};
-    }
-    if(!err){
-      // PreviousVotesCount
-      if(this.previousVotesCount && !this.previousVotesCount.match(/^\d+$/))
-        err = {code: codes['PREV_VOTES_COUNT'], message: "PreviousVotesCount must be a positive or zero integer"};
-    }
-    if(!err){
-      // PreviousVotesRoot
-      if(this.previousVotesRoot && !this.previousVotesRoot.match(/^[A-Z\d]{40}$/))
-        err = {code: codes['PREV_VOTES_ROOT'], message: "PreviousVotesRoot must be provided and match an uppercase SHA1 hash"};
     }
     if(!err){
       // VotersRoot
@@ -239,12 +223,6 @@ module.exports = function Amendment(rawAmend){
     raw += "NextRequiredVotes: " + this.nextVotes + "\n";
     if(this.previousHash){
       raw += "PreviousHash: " + this.previousHash + "\n";
-    }
-    if(this.previousVotesRoot){
-      raw += "PreviousVotesRoot: " + this.previousVotesRoot + "\n";
-    }
-    if(this.previousVotesCount){
-      raw += "PreviousVotesCount: " + this.previousVotesCount + "\n";
     }
     if(this.membersRoot){
       raw += "MembersRoot: " + this.membersRoot + "\n";
