@@ -72,7 +72,9 @@ module.exports = function Transaction(rawTx){
       'BAD_TX_NOTNULL': 161,
       'BAD_FUSION_COIN': 162,
       'BAD_FUSION_SUM': 163,
-      'BAD_COINS_OF_VARIOUS_AM': 164
+      'BAD_COINS_OF_VARIOUS_AM': 164,
+      'BAD_DIVISION_COIN': 165,
+      'BAD_DIVISION_SUM': 166
     }
     if(!err){
       // Version
@@ -115,7 +117,7 @@ module.exports = function Transaction(rawTx){
     }
     if(!err){
       // Type
-      if(!this.type || !this.type.match(/^(ISSUANCE|FUSION|TRANSFER)$/))
+      if(!this.type || !this.type.match(/^(ISSUANCE|FUSION|TRANSFER|DIVISION)$/))
         err = {code: codes['BAD_TYPE'], message: "Incorrect Type field"};
     }
     if(!err){
@@ -172,6 +174,50 @@ module.exports = function Transaction(rawTx){
           }
         }
       }
+      if(this.type == 'DIVISION'){
+        var resultingCoins = [];
+        var materialCoins = [];
+        var isFirstPart = true;
+        coins.forEach(function(coin, index){
+          // First coins (resulting coins) must be without transaction ID,
+          // while following coins are ALL considered material transaction
+          // AND provide transaction ID
+          isFirstPart = isFirstPart && !coin.transaction;
+          if (isFirstPart) {
+            resultingCoins.push(coin);
+          } else {
+            materialCoins.push(coin);
+          }
+        });
+        resultingCoins.forEach(function (coin, index) {
+          if (!err) {
+            var coin_origin = coin.originType + "-" + coin.originNumber;
+            if(!coin_origin.match(/^D-\d+$/)){
+              err = {code: codes['BAD_DIVISION_COIN'], message: "Coin[" + index + "] of DIVISION transaction has bad origin"};
+            }
+          }
+        });
+        materialCoins.forEach(function (coin, index) {
+          if (!err) {
+            if(!coin.transaction){
+              err = {code: codes['BAD_DIVISION_COIN'], message: "Coin[" + index + "] of DIVISION transaction must provide transaction ID"};
+            }
+          }
+        });
+        if (!err) {
+          var divisionSum = 0;
+          var materialSum = 0;
+          resultingCoins.forEach(function (coin, index) {
+            divisionSum += coin.base * Math.pow(10, coin.power);
+          });
+          materialCoins.forEach(function (coin, index) {
+            materialSum += coin.base * Math.pow(10, coin.power);
+          });
+          if(materialSum != divisionSum){
+            err = {code: codes['BAD_DIVISION_SUM'], message: "Bad division sum (material coins sums " + materialSum + ' but division coins sums ' + divisionSum + ')'};
+          }
+        }
+      }
     }
     if(err){
       this.error = err.message;
@@ -184,7 +230,7 @@ module.exports = function Transaction(rawTx){
   this.getCoins = function() {
     var coins = [];
     for (var i = 0; i < this.coins.length; i++) {
-      var matches = this.coins[i].match(/([A-Z\d]{40})-(\d+)-(\d)-(\d+)-(A|F)-(\d+)(, ([A-Z\d]{40})-(\d+))?/);
+      var matches = this.coins[i].match(/([A-Z\d]{40})-(\d+)-(\d)-(\d+)-(A|F|D)-(\d+)(, ([A-Z\d]{40})-(\d+))?/);
       if(matches && matches.length == 10){
         coins.push({
           issuer: matches[1],
@@ -243,7 +289,7 @@ function extractCoins(tx, rawTx, cap) {
     if(lines[lines.length - 1].match(/^$/)){
       for (var i = 0; i < lines.length - 1; i++) {
         var line = lines[i];
-        var fprChange = line.match(/([A-Z\d]{40})-(\d+)-(\d)-(\d+)-(A|F)-(\d+)(, ([A-Z\d]{40})-(\d+))?/);
+        var fprChange = line.match(/([A-Z\d]{40})-(\d+)-(\d)-(\d+)-(A|F|D)-(\d+)(, ([A-Z\d]{40})-(\d+))?/);
         if(fprChange && fprChange.length == 10){
           tx[cap.prop].push(line);
         }

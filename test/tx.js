@@ -234,6 +234,161 @@ describe('Transaction', function(){
     });
   });
 
+  describe('1 (division)', function(){
+
+    var tx1;
+
+    // Loads tx1 with its data
+    before(function(done) {
+      tx1 = new Transaction();
+      loadFromFile(tx1, __dirname + "/data/tx/division1.tx", done);
+    });
+
+    it('it should have no error', function(){
+      should.not.exist(tx1.errorCode);
+    });
+
+    it('it should have error anyway', function(){
+      should.exist(tx1.error);
+    });
+
+    it('should be version 1', function(){
+      assert.equal(tx1.version, 1);
+    });
+
+    it('should be number 93', function(){
+      assert.equal(tx1.number, 93);
+    });
+
+    it('should have beta_brousoufs currency name', function(){
+      assert.equal(tx1.currency, 'beta_brousouf');
+    });
+
+    it('should be DIVISION', function(){
+      assert.equal(tx1.type, 'DIVISION');
+    });
+
+    it('should have sender 31A6302161AC8F5938969E85399EB3415C237F93', function(){
+      assert.equal(tx1.sender, "31A6302161AC8F5938969E85399EB3415C237F93");
+    });
+
+    it('should have recipient 31A6302161AC8F5938969E85399EB3415C237F93', function(){
+      assert.equal(tx1.recipient, "31A6302161AC8F5938969E85399EB3415C237F93");
+    });
+
+    it('should have 6 coins', function(){
+      assert.equal(tx1.getCoins().length, 6);
+    });
+
+    it('should have 4 firsts coins without transaction link, the remaining 2 with it', function(){
+      var coins = tx1.getCoins();
+      for (var i = 0; i < 4; i++) {
+        should.not.exist(coins[i].transaction);
+      };
+      for (var i = 4; i < coins.length; i++) {
+        should.exist(coins[i].transaction);
+      };
+      coins[0].base.should.equal(2);
+      coins[1].base.should.equal(2);
+      coins[2].base.should.equal(1);
+      coins[3].base.should.equal(1);
+      coins[4].base.should.equal(5);
+      coins[5].base.should.equal(1);
+      coins[0].power.should.equal(1);
+      coins[1].power.should.equal(1);
+      coins[2].power.should.equal(1);
+      coins[3].power.should.equal(1);
+      coins[4].power.should.equal(1);
+      coins[5].power.should.equal(1);
+    });
+
+    it('should have a comment', function(){
+      should.exist(tx1.comment);
+    });
+
+    it('its computed hash should be 774C6819EEAD244C14AF7F10F9EC6FDDAA1373E7', function(){
+      assert.equal(tx1.hash, '774C6819EEAD244C14AF7F10F9EC6FDDAA1373E7');
+    });
+
+    it('its manual hash should be 774C6819EEAD244C14AF7F10F9EC6FDDAA1373E7', function(){
+      assert.equal(sha1(tx1.getRaw()).toUpperCase(), '774C6819EEAD244C14AF7F10F9EC6FDDAA1373E7');
+    });
+  });
+
+  describe('2 (division)', function(){
+
+    var tx1;
+
+    // Loads tx1 with its data
+    before(function(done) {
+      tx1 = new Transaction();
+      loadFromFile(tx1, __dirname + "/data/tx/division2.tx", done);
+    });
+
+    it('it should have error code 166 (bad division sum)', function(){
+      should.exist(tx1.errorCode);
+      assert.equal(tx1.errorCode, 166);
+    });
+
+    it('it should have error anyway', function(){
+      should.exist(tx1.error);
+    });
+
+    it('should be version 1', function(){
+      assert.equal(tx1.version, 1);
+    });
+
+    it('should be number 93', function(){
+      assert.equal(tx1.number, 93);
+    });
+
+    it('should have beta_brousoufs currency name', function(){
+      assert.equal(tx1.currency, 'beta_brousouf');
+    });
+
+    it('should be DIVISION', function(){
+      assert.equal(tx1.type, 'DIVISION');
+    });
+
+    it('should have sender 31A6302161AC8F5938969E85399EB3415C237F93', function(){
+      assert.equal(tx1.sender, "31A6302161AC8F5938969E85399EB3415C237F93");
+    });
+
+    it('should have recipient 31A6302161AC8F5938969E85399EB3415C237F93', function(){
+      assert.equal(tx1.recipient, "31A6302161AC8F5938969E85399EB3415C237F93");
+    });
+
+    it('should have 6 coins', function(){
+      assert.equal(tx1.getCoins().length, 6);
+    });
+
+    it('should have 4 firsts coins without transaction link, the remaining 2 with it', function(){
+      var coins = tx1.getCoins();
+      for (var i = 0; i < 4; i++) {
+        should.not.exist(coins[i].transaction);
+      };
+      for (var i = 4; i < coins.length; i++) {
+        should.exist(coins[i].transaction);
+      };
+      coins[0].base.should.equal(2);
+      coins[1].base.should.equal(2);
+      coins[2].base.should.equal(1);
+      coins[3].base.should.equal(3);
+      coins[4].base.should.equal(5);
+      coins[5].base.should.equal(1);
+      coins[0].power.should.equal(1);
+      coins[1].power.should.equal(1);
+      coins[2].power.should.equal(1);
+      coins[3].power.should.equal(1);
+      coins[4].power.should.equal(1);
+      coins[5].power.should.equal(1);
+    });
+
+    it('should have a comment', function(){
+      should.exist(tx1.comment);
+    });
+  });
+
   describe('2 (issuance)', function(){
 
     var tx1;
