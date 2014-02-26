@@ -159,81 +159,6 @@ describe('Transaction', function(){
     });
   });
 
-  describe('1 (fusion)', function(){
-
-    var tx1;
-
-    // Loads tx1 with its data
-    before(function(done) {
-      tx1 = new Transaction();
-      loadFromFile(tx1, __dirname + "/data/tx/fusion1.tx", done);
-    });
-
-    it('it should have no error', function(){
-      should.not.exist(tx1.errorCode);
-    });
-
-    it('it should have error anyway', function(){
-      should.exist(tx1.error);
-    });
-
-    it('should be version 1', function(){
-      assert.equal(tx1.version, 1);
-    });
-
-    it('should be number 92', function(){
-      assert.equal(tx1.number, 92);
-    });
-
-    it('should have beta_brousoufs currency name', function(){
-      assert.equal(tx1.currency, 'beta_brousouf');
-    });
-
-    it('should be FUSION', function(){
-      assert.equal(tx1.type, 'FUSION');
-    });
-
-    it('should have sender 31A6302161AC8F5938969E85399EB3415C237F93', function(){
-      assert.equal(tx1.sender, "31A6302161AC8F5938969E85399EB3415C237F93");
-    });
-
-    it('should have recipient 31A6302161AC8F5938969E85399EB3415C237F93', function(){
-      assert.equal(tx1.recipient, "31A6302161AC8F5938969E85399EB3415C237F93");
-    });
-
-    it('should have 4 coins', function(){
-      assert.equal(tx1.getCoins().length, 4);
-    });
-
-    it('should have first coin with transaction link,n ot the others', function(){
-      var coins = tx1.getCoins();
-      should.not.exist(coins[0].transaction);
-      for (var i = 1; i < coins.length; i++) {
-        should.exist(coins[i].transaction);
-      };
-      coins[0].base.should.equal(5);
-      coins[1].base.should.equal(3);
-      coins[2].base.should.equal(1);
-      coins[3].base.should.equal(1);
-      coins[0].power.should.equal(1);
-      coins[1].power.should.equal(1);
-      coins[2].power.should.equal(1);
-      coins[3].power.should.equal(1);
-    });
-
-    it('should have a comment', function(){
-      should.exist(tx1.comment);
-    });
-
-    it('its computed hash should be CBB0C2E9A9D5C9150C6DA52E1FD03FA556909A43', function(){
-      assert.equal(tx1.hash, 'CBB0C2E9A9D5C9150C6DA52E1FD03FA556909A43');
-    });
-
-    it('its manual hash should be CBB0C2E9A9D5C9150C6DA52E1FD03FA556909A43', function(){
-      assert.equal(sha1(tx1.getRaw()).toUpperCase(), 'CBB0C2E9A9D5C9150C6DA52E1FD03FA556909A43');
-    });
-  });
-
   describe('1 (division)', function(){
 
     var tx1;
@@ -306,12 +231,12 @@ describe('Transaction', function(){
       should.exist(tx1.comment);
     });
 
-    it('its computed hash should be 774C6819EEAD244C14AF7F10F9EC6FDDAA1373E7', function(){
-      assert.equal(tx1.hash, '774C6819EEAD244C14AF7F10F9EC6FDDAA1373E7');
+    it('its computed hash should be 54D2901676BF93C36F980E4F0855DBBA2A8D0293', function(){
+      assert.equal(tx1.hash, '54D2901676BF93C36F980E4F0855DBBA2A8D0293');
     });
 
-    it('its manual hash should be 774C6819EEAD244C14AF7F10F9EC6FDDAA1373E7', function(){
-      assert.equal(sha1(tx1.getRaw()).toUpperCase(), '774C6819EEAD244C14AF7F10F9EC6FDDAA1373E7');
+    it('its manual hash should be 54D2901676BF93C36F980E4F0855DBBA2A8D0293', function(){
+      assert.equal(sha1(tx1.getRaw()).toUpperCase(), '54D2901676BF93C36F980E4F0855DBBA2A8D0293');
     });
   });
 

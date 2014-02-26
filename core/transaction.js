@@ -70,8 +70,6 @@ module.exports = function Transaction(rawTx){
       'BAD_TX_NEEDONECOIN': 159,
       'BAD_TX_NULL': 160,
       'BAD_TX_NOTNULL': 161,
-      'BAD_FUSION_COIN': 162,
-      'BAD_FUSION_SUM': 163,
       'BAD_COINS_OF_VARIOUS_AM': 164,
       'BAD_DIVISION_COIN': 165,
       'BAD_DIVISION_SUM': 166
@@ -102,9 +100,9 @@ module.exports = function Transaction(rawTx){
         err = {code: codes['BAD_RECIPIENT'], message: "Recipient must be provided and match an uppercase SHA1 hash"};
     }
     if(!err){
-      // Recipient = Sender for ISSUANCE and FUSION
+      // Recipient = Sender for ISSUANCE and CHANGE
       if(this.type != 'TRANSFER' && this.sender != this.recipient){
-        err = {code: codes['BAD_RECIPIENT_OF_NONTRANSFERT'], message: "Recipient must be equal to Sender on ISSUANCE and FUSION transactions"};
+        err = {code: codes['BAD_RECIPIENT_OF_NONTRANSFERT'], message: "Recipient must be equal to Sender on ISSUANCE and CHANGE transactions"};
       }
     }
     if(!err){
@@ -117,7 +115,7 @@ module.exports = function Transaction(rawTx){
     }
     if(!err){
       // Type
-      if(!this.type || !this.type.match(/^(ISSUANCE|FUSION|TRANSFER|DIVISION)$/))
+      if(!this.type || !this.type.match(/^(ISSUANCE|TRANSFER|DIVISION)$/))
         err = {code: codes['BAD_TYPE'], message: "Incorrect Type field"};
     }
     if(!err){
@@ -147,31 +145,6 @@ module.exports = function Transaction(rawTx){
               err = {code: codes['BAD_COINS_OF_VARIOUS_AM'], message: "Coin in an ISSUANCE transaction must ALL target the SAME amendment number"};
             }
           });
-        }
-      }
-      if(this.type == 'FUSION'){
-        var coin0_origin = coins[0].originType + "-" + coins[0].originNumber;
-        if(!coin0_origin.match(/^F-\d+$/)){
-          err = {code: codes['BAD_FUSION_COIN'], message: "First coin of FUSION transaction has bad origin"};
-        }
-        else{
-          var sum = 0;
-          coins.forEach(function (coin, index) {
-            if(!err){
-              if(index == 0 && coin.transaction)
-                err = {code: codes['BAD_TX_NOTNULL'], message: "First coin in a FUSION transaction must NOT have a transaction link"};
-              if(index > 0){
-                if(!coin.transaction)
-                  err = {code: codes['BAD_TX_NULL'], message: "Non-first coin in a FUSION transaction must have a transaction link"};
-                else
-                  sum += coin.base * Math.pow(10, coin.power);
-              }
-            }
-          });
-          var coinValue = coins[0].base * Math.pow(10, coins[0].power);
-          if(sum != coinValue){
-            err = {code: codes['BAD_FUSION_SUM'], message: "Bad fusion sum (fusion coin equal " + coinValue + ' but should equal ' + sum + ')'};
-          }
         }
       }
       if(this.type == 'DIVISION'){
@@ -230,7 +203,7 @@ module.exports = function Transaction(rawTx){
   this.getCoins = function() {
     var coins = [];
     for (var i = 0; i < this.coins.length; i++) {
-      var matches = this.coins[i].match(/([A-Z\d]{40})-(\d+)-(\d)-(\d+)-(A|F|D)-(\d+)(, ([A-Z\d]{40})-(\d+))?/);
+      var matches = this.coins[i].match(/([A-Z\d]{40})-(\d+)-(\d)-(\d+)-(A|D)-(\d+)(, ([A-Z\d]{40})-(\d+))?/);
       if(matches && matches.length == 10){
         coins.push({
           issuer: matches[1],
@@ -289,7 +262,7 @@ function extractCoins(tx, rawTx, cap) {
     if(lines[lines.length - 1].match(/^$/)){
       for (var i = 0; i < lines.length - 1; i++) {
         var line = lines[i];
-        var fprChange = line.match(/([A-Z\d]{40})-(\d+)-(\d)-(\d+)-(A|F|D)-(\d+)(, ([A-Z\d]{40})-(\d+))?/);
+        var fprChange = line.match(/([A-Z\d]{40})-(\d+)-(\d)-(\d+)-(A|D)-(\d+)(, ([A-Z\d]{40})-(\d+))?/);
         if(fprChange && fprChange.length == 10){
           tx[cap.prop].push(line);
         }
