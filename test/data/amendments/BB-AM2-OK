@@ -3,7 +3,8 @@ Currency: beta_brousouf
 Number: 2
 GeneratedOn: 1380400542
 UniversalDividend: 100
-CoinMinimalPower: 0
+CoinBase: 0
+CoinList: 20 10 15
 NextRequiredVotes: 2
 PreviousHash: F07D0B6DBB7EA99E5208752EABDB8B721C0010E9
 MembersRoot: F92B6F81C85200250EE51783F5F9F6ACA57A9AFF

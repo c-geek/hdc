@@ -38,16 +38,16 @@ describe('Amendment', function(){
       assert.equal(amTest.number, 2);
     });
 
-    it('should have a niversal Dividend of value 122', function(){
+    it('should have a Universal Dividend of value 122', function(){
       assert.equal(amTest.dividend, 122);
     });
 
-    it('should have a Minimal Coin Power of 3', function(){
-      assert.equal(amTest.coinMinPower, 3);
+    it('should have a CoinBase Power of 0', function(){
+      assert.equal(amTest.coinBase, 0);
     });
 
-    it('should have verification error code 172', function(){
-      assert.equal(errCode, 172);
+    it('should have verification error code 175 (bad coin sum)', function(){
+      assert.equal(errCode, 175);
     });
   });
 });

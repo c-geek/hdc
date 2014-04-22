@@ -9,7 +9,7 @@ module.exports = function Amendment(rawAmend){
   this.number = null;
   this.generated = null;
   this.dividend = null;
-  this.coinMinPower = null;
+  this.coinBase = null;
   this.nextVotes = null;
   this.previousHash = null;
   this.membersRoot = null;
@@ -36,7 +36,8 @@ module.exports = function Amendment(rawAmend){
         {prop: "number",            regexp: /Number: (.*)/},
         {prop: "generated",         regexp: /GeneratedOn: (.*)/},
         {prop: "dividend",          regexp: /UniversalDividend: (.*)/},
-        {prop: "coinMinPower",      regexp: /CoinMinimalPower: (.*)/},
+        {prop: "coinBase",          regexp: /CoinBase: (.*)/},
+        {prop: "coinList",          regexp: /CoinList: (.*)/},
         {prop: "nextVotes",         regexp: /NextRequiredVotes: (.*)/},
         {prop: "previousHash",      regexp: /PreviousHash: (.*)/},
         {prop: "membersRoot",       regexp: /MembersRoot: (.*)/},
@@ -82,9 +83,9 @@ module.exports = function Amendment(rawAmend){
       'VOTERS_ROOT': 160,
       'VOTERS_COUNT': 161,
       'VOTERS_CHANGES': 162,
-      'COIN_MIN_POW_UD': 170,
-      'COIN_MIN_POW_INTEGER': 171,
-      'COIN_MIN_POW_TOOLOW': 172,
+      'COIN_BASE': 173,
+      'COIN_LIST': 174,
+      'COIN_SUM': 175
     }
     if(this.error){
       err = {code: 0, message: this.error};
@@ -113,15 +114,22 @@ module.exports = function Amendment(rawAmend){
       // Universal Dividend
       if(this.dividend && !this.dividend.match(/^\d+$/))
         err = {code: codes['UD'], message: "UniversalDividend must be a positive or zero integer"};
-    }
-    if(!err){
-      // Coin Minimal Power
-      if(this.coinMinPower && !this.dividend)
-        err = {code: codes['COIN_MIN_POW_UD'], message: "CoinMinimalPower requires a valued UniversalDividend field"};
-      else if(this.coinMinPower && !this.coinMinPower.match(/^\d+$/))
-        err = {code: codes['COIN_MIN_POW_INTEGER'], message: "CoinMinimalPower must be a positive or zero integer"};
-      else if(this.coinMinPower && this.dividend.length < parseInt(this.coinMinPower, 10) + 1)
-        err = {code: codes['COIN_MIN_POW_TOOLOW'], message: "No coin can be created with this value of CoinMinimalPower and UniversalDividend"};
+      // Coin Base
+      if(this.dividend && (!this.coinBase || !this.coinBase.match(/^\d+$/)))
+        err = {code: codes['COIN_BASE'], message: "CoinBase must be a positive or zero integer"};
+      // Coin List
+      if(this.dividend && (!this.coinList || !this.coinList.match(/^(\d+ )*\d+$/)))
+        err = {code: codes['COIN_LIST'], message: "CoinList must be a space separated list of positive or zero integers"};
+      else if(this.dividend) {
+        var dividendSum = 0;
+        var power = parseInt(this.coinBase);
+        this.coinList.split(" ").forEach(function(c){
+          dividendSum += parseInt(c) * Math.pow(2, power++);
+        });
+        if (parseInt(this.dividend) != dividendSum) {
+          err = {code: codes['COIN_SUM'], message: "CoinList sum '" + dividendSum + "' does not match UniversalDividend '" + this.dividend + "'"};
+        }
+      }
     }
     if(!err){
       // NextRequiredVotes
@@ -216,9 +224,8 @@ module.exports = function Amendment(rawAmend){
     raw += "GeneratedOn: " + this.generated + "\n";
     if(this.dividend){
       raw += "UniversalDividend: " + this.dividend + "\n";
-    }
-    if(this.coinMinPower){
-      raw += "CoinMinimalPower: " + this.coinMinPower + "\n";
+      raw += "CoinBase: " + this.coinBase + "\n";
+      raw += "CoinList: " + this.coinList + "\n";
     }
     raw += "NextRequiredVotes: " + this.nextVotes + "\n";
     if(this.previousHash){

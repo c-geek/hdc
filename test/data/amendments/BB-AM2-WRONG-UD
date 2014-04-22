@@ -4,7 +4,8 @@ Number: 2
 GeneratedOn: 1380400542
 PreviousHash: 5A6434BCD09400625CEA75BFE6F786829018BAD1
 UniversalDividend: 122
-CoinMinimalPower: 3
+CoinBase: 0
+CoinList: 121
 VotersRoot: DC7A9229DFDABFB9769789B7BFAE08048BCB856F
 VotersCount: 2
 VotersChanges:

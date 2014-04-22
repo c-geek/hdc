@@ -37,12 +37,12 @@ describe('Amendment', function(){
       assert.equal(amTest.generated, 1380400542);
     });
 
-    it('should have a niversal Dividend of value 100', function(){
+    it('should have a Universal Dividend of value 100', function(){
       assert.equal(amTest.dividend, 100);
     });
 
-    it('should have a Minimal Coin Power of 0', function(){
-      assert.equal(amTest.coinMinPower, 0);
+    it('should have a CoinBase Power of 0', function(){
+      assert.equal(amTest.coinBase, 0);
     });
 
     it('should have 2 next required votes', function(){
@@ -80,12 +80,12 @@ describe('Amendment', function(){
       assert.equal(amTest.votersCount, 2);
     });
 
-    it('its computed hash should be 02D8FCAA86A958EE07385C12DCDB4178BB5284CE', function(){
-      assert.equal(amTest.hash, '02D8FCAA86A958EE07385C12DCDB4178BB5284CE');
+    it('its computed hash should be 2B813028E8E2BAB1F6B768EA5C6651736C80F855', function(){
+      assert.equal(amTest.hash, '2B813028E8E2BAB1F6B768EA5C6651736C80F855');
     });
 
-    it('its manual hash should be 02D8FCAA86A958EE07385C12DCDB4178BB5284CE', function(){
-      assert.equal(sha1(amTest.getRaw()).toUpperCase(), '02D8FCAA86A958EE07385C12DCDB4178BB5284CE');
+    it('its manual hash should be 2B813028E8E2BAB1F6B768EA5C6651736C80F855', function(){
+      assert.equal(sha1(amTest.getRaw()).toUpperCase(), '2B813028E8E2BAB1F6B768EA5C6651736C80F855');
     });
   });
 });
