@@ -41,6 +41,10 @@ describe('Amendment', function(){
       assert.equal(amTest.dividend, 100);
     });
 
+    it('should have a CoinAlgo "Base2Draft"', function(){
+      assert.equal(amTest.coinAlgo, 'Base2Draft');
+    });
+
     it('should have a CoinBase Power of 0', function(){
       assert.equal(amTest.coinBase, 0);
     });
@@ -80,12 +84,12 @@ describe('Amendment', function(){
       assert.equal(amTest.votersCount, 2);
     });
 
-    it('its computed hash should be 2B813028E8E2BAB1F6B768EA5C6651736C80F855', function(){
-      assert.equal(amTest.hash, '2B813028E8E2BAB1F6B768EA5C6651736C80F855');
+    it('its computed hash should be A8844D78F563080CF4E6683380E238051B7A6B46', function(){
+      assert.equal(amTest.hash, 'A8844D78F563080CF4E6683380E238051B7A6B46');
     });
 
-    it('its manual hash should be 2B813028E8E2BAB1F6B768EA5C6651736C80F855', function(){
-      assert.equal(sha1(amTest.getRaw()).toUpperCase(), '2B813028E8E2BAB1F6B768EA5C6651736C80F855');
+    it('its manual hash should be A8844D78F563080CF4E6683380E238051B7A6B46', function(){
+      assert.equal(sha1(amTest.getRaw()).toUpperCase(), 'A8844D78F563080CF4E6683380E238051B7A6B46');
     });
   });
 });

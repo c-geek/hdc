@@ -10,6 +10,8 @@ module.exports = function Amendment(rawAmend){
   this.generated = null;
   this.dividend = null;
   this.coinBase = null;
+  this.coinList = [];
+  this.coinAlgo = null;
   this.nextVotes = null;
   this.previousHash = null;
   this.membersRoot = null;
@@ -38,6 +40,7 @@ module.exports = function Amendment(rawAmend){
         {prop: "dividend",          regexp: /UniversalDividend: (.*)/},
         {prop: "coinBase",          regexp: /CoinBase: (.*)/},
         {prop: "coinList",          regexp: /CoinList: (.*)/},
+        {prop: "coinAlgo",          regexp: /CoinAlgo: (.*)/},
         {prop: "nextVotes",         regexp: /NextRequiredVotes: (.*)/},
         {prop: "previousHash",      regexp: /PreviousHash: (.*)/},
         {prop: "membersRoot",       regexp: /MembersRoot: (.*)/},
@@ -224,6 +227,7 @@ module.exports = function Amendment(rawAmend){
     raw += "GeneratedOn: " + this.generated + "\n";
     if(this.dividend){
       raw += "UniversalDividend: " + this.dividend + "\n";
+      raw += "CoinAlgo: " + this.coinAlgo + "\n";
       raw += "CoinBase: " + this.coinBase + "\n";
       raw += "CoinList: " + this.coinList + "\n";
     }

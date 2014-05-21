@@ -3,6 +3,7 @@ Currency: beta_brousouf
 Number: 2
 GeneratedOn: 1380400542
 UniversalDividend: 100
+CoinAlgo: Base2Draft
 CoinBase: 0
 CoinList: 20 10 15
 NextRequiredVotes: 2
